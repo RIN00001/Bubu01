@@ -1,7 +1,7 @@
 import { generateToken } from "../utils/jwt-util";
 
 export interface UserJWTPayload {
-  Id: string;
+  id: number;
   username: string;
   email: string;
 }
@@ -21,13 +21,13 @@ export interface UserResponse {
 }
 
 export function toUserResponse(
-  id: string,
+  id: number,
   username: string,
   email: string
 ): UserResponse{
   return {
     token: generateToken({
-      Id: id,
+      id: id,
       username: username,
       email: email,
   }, '1h'

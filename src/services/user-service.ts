@@ -1,4 +1,3 @@
-// src/services/user-service.ts
 import bcrypt from 'bcrypt';
 import { prismaClient } from '../utils/database-util';
 import { validation } from '../validations/validation';
@@ -32,7 +31,7 @@ export class UserService {
       },
     });
 
-    return toUserResponse(user.id, user.username, user.email);
+  return toUserResponse(user.id, user.username, user.email);
   }
 
   static async login(request: LoginUserRequest) {

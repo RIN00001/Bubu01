@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -28,7 +22,7 @@ enum TransactionType {
 }
 
 model User {
-  id              String    @id @default(uuid())
+  id              Int       @id @default(autoincrement())
   username        String    @unique
   email           String    @unique
   passwordHash    String
@@ -38,7 +32,7 @@ model User {
   timezone        String?
   dailyLimit      Float?
 
-  defaultWalletId String?   @unique
+  defaultWalletId Int?      @unique
   defaultWallet   Wallet?   @relation("DefaultWallet", fields: [defaultWalletId], references: [id])
 
   wallets         Wallet[]
@@ -47,10 +41,9 @@ model User {
   categories      Category[]
 }
 
-
 model Wallet {
-  id        String   @id @default(uuid())
-  userId    String
+  id        Int      @id @default(autoincrement())
+  userId    Int
   user      User     @relation(fields: [userId], references: [id])
 
   defaultForUser User? @relation("DefaultWallet") // back-relation
@@ -68,8 +61,8 @@ model Wallet {
 }
 
 model Book {
-  id        String   @id @default(uuid())
-  userId    String
+  id        Int      @id @default(autoincrement())
+  userId    Int
   user      User     @relation(fields: [userId], references: [id])
 
   name      String
@@ -83,14 +76,14 @@ model Book {
 }
 
 model Item {
-  id            String    @id @default(uuid())
-  bookId        String?
+  id            Int       @id @default(autoincrement())
+  bookId        Int?
   book          Book?     @relation(fields: [bookId], references: [id])
 
-  walletId      String?
+  walletId      Int?
   wallet        Wallet?   @relation(fields: [walletId], references: [id])
 
-  categoryId    String?
+  categoryId    Int?
   category      Category? @relation(fields: [categoryId], references: [id])
 
   type          TransactionType
@@ -106,8 +99,8 @@ model Item {
 }
 
 model Saving {
-  id         String   @id @default(uuid())
-  userId     String
+  id         Int      @id @default(autoincrement())
+  userId     Int
   user       User     @relation(fields: [userId], references: [id])
 
   name       String
@@ -116,7 +109,6 @@ model Saving {
 
   deadline   DateTime?
 
-  // many-to-many between wallets and savings
   wallets    Wallet[] @relation("SavingWallets")
 
   createdAt DateTime @default(now())
@@ -124,14 +116,13 @@ model Saving {
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  userId    String?
+  id        Int      @id @default(autoincrement())
+  userId    Int?
   user      User?    @relation(fields: [userId], references: [id])
 
   name      String
   icon      String?
 
-  // back-rel for Item.category
   items     Item[]
 
   createdAt DateTime @default(now())

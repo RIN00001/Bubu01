@@ -6,7 +6,7 @@ CREATE TYPE "TransactionType" AS ENUM ('INCOME', 'EXPENSE');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
@@ -14,15 +14,15 @@ CREATE TABLE "User" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "timezone" TEXT,
     "dailyLimit" DOUBLE PRECISION,
-    "defaultWalletId" TEXT,
+    "defaultWalletId" INTEGER,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Wallet" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "balance" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "isDefault" BOOLEAN NOT NULL DEFAULT false,
@@ -34,8 +34,8 @@ CREATE TABLE "Wallet" (
 
 -- CreateTable
 CREATE TABLE "Book" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "program" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -46,10 +46,10 @@ CREATE TABLE "Book" (
 
 -- CreateTable
 CREATE TABLE "Item" (
-    "id" TEXT NOT NULL,
-    "bookId" TEXT,
-    "walletId" TEXT,
-    "categoryId" TEXT,
+    "id" SERIAL NOT NULL,
+    "bookId" INTEGER,
+    "walletId" INTEGER,
+    "categoryId" INTEGER,
     "type" "TransactionType" NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
     "name" TEXT NOT NULL,
@@ -64,8 +64,8 @@ CREATE TABLE "Item" (
 
 -- CreateTable
 CREATE TABLE "Saving" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "target" DOUBLE PRECISION,
     "current" DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -78,8 +78,8 @@ CREATE TABLE "Saving" (
 
 -- CreateTable
 CREATE TABLE "Category" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT,
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER,
     "name" TEXT NOT NULL,
     "icon" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -90,16 +90,16 @@ CREATE TABLE "Category" (
 
 -- CreateTable
 CREATE TABLE "_BookWallets" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
 
     CONSTRAINT "_BookWallets_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_SavingWallets" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL,
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL,
 
     CONSTRAINT "_SavingWallets_AB_pkey" PRIMARY KEY ("A","B")
 );
