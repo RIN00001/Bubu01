@@ -7,7 +7,7 @@ import {
   UpdateWalletRequest
 } from "../models/wallet-model";
 
-import { ResponseError } from "../error/rensponse-error";
+import { ResponseError } from "../error/response-error";
 
 export class WalletService {
   static async create(userId: number, request: CreateWalletRequest) {

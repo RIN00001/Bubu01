@@ -7,7 +7,7 @@ import {
   LoginUserRequest,
   toUserResponse,
 } from '../models/user-model';
-import { ResponseError } from '../error/rensponse-error';
+import { ResponseError } from '../error/response-error';
 
 export class UserService {
   static async register(request: RegisteredUserRequest) {
