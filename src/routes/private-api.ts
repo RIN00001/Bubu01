@@ -4,6 +4,8 @@ import { BookController } from "../controllers/book-controller";
 import { WalletController } from "../controllers/wallet-controller";
 
 import { ItemController } from '../controllers/item-controller';
+
+import { SavingController } from '../controllers/saving-controller';
 export const privateRouter = express.Router()
 
 privateRouter.use(authMiddleware)
@@ -31,3 +33,9 @@ privateRouter.get("/items", ItemController.list);
 privateRouter.get("/items/:itemId", ItemController.get);
 privateRouter.put("/items/:itemId", ItemController.update);
 privateRouter.delete("/items/:itemId", ItemController.remove);
+
+//Saving Routes
+privateRouter.post("/saving", SavingController.createSaving);
+privateRouter.get("/saving/:id", SavingController.getSavingById);
+privateRouter.put("/saving/:id", SavingController.updateSaving);
+privateRouter.delete("/saving/:id", SavingController.deleteSaving);
