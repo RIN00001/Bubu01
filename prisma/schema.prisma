@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RecurringFreq {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  CUSTOM
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id              String    @id @default(uuid())
+  username        String    @unique
+  email           String    @unique
+  passwordHash    String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  timezone        String?
+  dailyLimit      Float?
+
+  defaultWalletId String?   @unique
+  defaultWallet   Wallet?   @relation("DefaultWallet", fields: [defaultWalletId], references: [id])
+
+  wallets         Wallet[]
+  books           Book[]
+  savings         Saving[]
+  categories      Category[]
+}
+
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  defaultForUser User? @relation("DefaultWallet") // back-relation
+
+  name      String
+  balance   Float    @default(0)
+  isDefault Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  books     Book[]   @relation("BookWallets")
+  items     Item[]
+  savings   Saving[] @relation("SavingWallets")
+}
+
+model Book {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  name      String
+  program   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wallets   Wallet[] @relation("BookWallets")
+  items     Item[]
+}
+
+model Item {
+  id            String    @id @default(uuid())
+  bookId        String?
+  book          Book?     @relation(fields: [bookId], references: [id])
+
+  walletId      String?
+  wallet        Wallet?   @relation(fields: [walletId], references: [id])
+
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+
+  type          TransactionType
+  amount        Float
+  name          String
+  date          DateTime
+
+  recurringRule String?
+  recurringFreq RecurringFreq?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Saving {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  name       String
+  target     Float?
+  current    Float    @default(0)
+
+  deadline   DateTime?
+
+  // many-to-many between wallets and savings
+  wallets    Wallet[] @relation("SavingWallets")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  name      String
+  icon      String?
+
+  // back-rel for Item.category
+  items     Item[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
