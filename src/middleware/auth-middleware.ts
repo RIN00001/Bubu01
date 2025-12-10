@@ -2,6 +2,8 @@ import { NextFunction, Response } from "express";
 import { UserRequest } from "../models/user-request-model";
 import { verifyToken } from "../utils/jwt-util";
 import { ResponseError } from "../error/rensponse-error";
+
+
 export const authMiddleware = (req: UserRequest, res: Response, next: NextFunction) => {
     try{
         const authHeader = req.headers["authorization"];
