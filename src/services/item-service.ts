@@ -1,5 +1,5 @@
 import { Item } from "../../generated/prisma/client";
-import { ResponseError } from "../error/rensponse-error";
+import { ResponseError } from "../error/response-error";
 import { CreateItemRequest, toItemResponse, UpdateItemRequest } from "../models/item-model";
 import { UserJWTPayload } from "../models/user-model";
 import { prismaClient } from "../utils/database-util";

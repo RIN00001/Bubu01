@@ -2,7 +2,7 @@ import { prismaClient } from "../utils/database-util";
 import { validation } from "../validations/validation";
 import { BookValidation } from "../validations/book-validation";
 import { CreateBookRequest, UpdateBookRequest } from "../models/book-model";
-import { ResponseError } from "../error/rensponse-error";
+import { ResponseError } from "../error/response-error";
 
 export class BookService {
   static async create(userId: number, request: CreateBookRequest) {

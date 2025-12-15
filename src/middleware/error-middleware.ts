@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import { ResponseError } from "../error/rensponse-error";
+import { ResponseError } from "../error/response-error";
 
 
 export const errorMiddleware = (error: Error, req: Request, res: Response, next: NextFunction) => {

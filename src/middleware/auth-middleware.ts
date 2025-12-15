@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { UserRequest } from "../models/user-request-model";
 import { verifyToken } from "../utils/jwt-util";
-import { ResponseError } from "../error/rensponse-error";
+import { ResponseError } from "../error/response-error";
 
 
 export const authMiddleware = (req: UserRequest, res: Response, next: NextFunction) => {
