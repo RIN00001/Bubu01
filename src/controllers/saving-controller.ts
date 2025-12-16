@@ -29,6 +29,19 @@ export class SavingController {
     }
 };
 
+static async getAllSavings(req: Request, res: Response) {
+    try {
+        const savings = await prisma.saving.findMany({
+            include: { wallets: { select: { id: true, name: true } } }
+        });
+
+        const response = savings.map(toSavingResponse);
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch savings' });
+    }
+};
+
 static async getSavingById(req: Request, res: Response) {
     try {
         const { id } = req.params;

@@ -32,7 +32,8 @@ privateRouter.get("/items/:itemId", ItemController.get);
 privateRouter.put("/items/:itemId", ItemController.update);
 privateRouter.delete("/items/:itemId", ItemController.remove);
 
-// Saving Routes
+//Saving Routes
+privateRouter.get("/savings", SavingController.getAllSavings);
 privateRouter.post("/saving", SavingController.createSaving);
 privateRouter.get("/saving/:id", SavingController.getSavingById);
 privateRouter.put("/saving/:id", SavingController.updateSaving);
