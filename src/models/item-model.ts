@@ -9,7 +9,7 @@ export interface CreateItemRequest {
     type: TransactionType
     amount: number
     name: string
-    date: Date
+    date: string | Date
 }
 
 export interface UpdateItemRequest {
@@ -20,7 +20,7 @@ export interface UpdateItemRequest {
     type?: TransactionType
     amount?: number
     name?: string
-    date?: Date
+    date?: string | Date
 }
 
 export interface ItemResponse {
@@ -31,7 +31,7 @@ export interface ItemResponse {
     type: TransactionType
     amount: number
     name: string
-    date: Date
+    date: string | Date
 }
 
 export function toItemResponse (item: Item): ItemResponse{
