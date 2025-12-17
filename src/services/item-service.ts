@@ -38,12 +38,10 @@ export class ItemService {
     static async create(user: UserJWTPayload, request: CreateItemRequest) {
         const createRequest = validation.validate(ItemValidation.CREATE, request);
 
-        // Ensure at least one of bookId or walletId is provided
         if (!createRequest.bookId && !createRequest.walletId) {
             throw new ResponseError(400, "Either bookId or walletId must be provided");
         }
 
-        // Verify ownership of book, wallet, and category if they are provided
         if (createRequest.bookId) {
             const book = await prismaClient.book.findFirst({
                 where: { id: createRequest.bookId, userId: user.id }
