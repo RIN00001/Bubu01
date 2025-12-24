@@ -2,6 +2,7 @@ import { Response, NextFunction } from "express";
 import { UserRequest } from "../models/user-request-model";
 import { CategoryService } from "../services/category-service";
 import { CreateCategoryRequest, UpdateCategoryRequest } from "../models/category-model";
+import { TransactionType } from "../../generated/prisma";
 
 export class CategoryController {
     static async create(req: UserRequest, res: Response, next: NextFunction) {
@@ -26,10 +27,11 @@ export class CategoryController {
 
     static async list(req: UserRequest, res: Response, next: NextFunction) {
         try {
+            const type = req.query.type as TransactionType || undefined
+
             const result = await CategoryService.list(req.user!);
             res.status(200).json({ data: result });
         } catch (error) {
-            // Pastikan blok catch ini tidak kosong
             next(error);
         }
     }

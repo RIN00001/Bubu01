@@ -22,108 +22,110 @@ enum TransactionType {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  username        String    @unique
-  email           String    @unique
-  passwordHash    String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  timezone        String?
-  dailyLimit      Float?
+  timezone   String?
+  dailyLimit Float?
 
-  defaultWalletId Int?      @unique
-  defaultWallet   Wallet?   @relation("DefaultWallet", fields: [defaultWalletId], references: [id])
+  defaultWalletId Int?    @unique
+  defaultWallet   Wallet? @relation("DefaultWallet", fields: [defaultWalletId], references: [id])
 
-  wallets         Wallet[]
-  books           Book[]
-  savings         Saving[]
-  categories      Category[]
+  wallets    Wallet[]
+  books      Book[]
+  savings    Saving[]
+  categories Category[]
 }
 
 model Wallet {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
   defaultForUser User? @relation("DefaultWallet") // back-relation
 
   name      String
-  balance   Float    @default(0)
-  isDefault Boolean  @default(false)
+  balance   Float   @default(0)
+  isDefault Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  books     Book[]   @relation("BookWallets")
-  items     Item[]
-  savings   Saving[] @relation("SavingWallets")
+  books   Book[]   @relation("BookWallets")
+  items   Item[]
+  savings Saving[] @relation("SavingWallets")
 }
 
 model Book {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  name      String
-  program   String?
+  name    String
+  program String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  wallets   Wallet[] @relation("BookWallets")
-  items     Item[]
+  wallets Wallet[] @relation("BookWallets")
+  items   Item[]
 }
 
 model Item {
-  id            Int       @id @default(autoincrement())
-  bookId        Int?
-  book          Book?     @relation(fields: [bookId], references: [id])
+  id     Int   @id @default(autoincrement())
+  bookId Int?
+  book   Book? @relation(fields: [bookId], references: [id])
 
-  walletId      Int?
-  wallet        Wallet?   @relation(fields: [walletId], references: [id])
+  walletId Int?
+  wallet   Wallet? @relation(fields: [walletId], references: [id])
 
-  categoryId    Int?
-  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
-  type          TransactionType
-  amount        Float
-  name          String
-  date          DateTime
+  type   TransactionType
+  amount Float
+  name   String
+  date   DateTime
 
   recurringRule String?
   recurringFreq RecurringFreq?
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Saving {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  name       String
-  target     Float?
-  current    Float    @default(0)
+  name    String
+  target  Float?
+  current Float  @default(0)
 
-  deadline   DateTime?
+  deadline DateTime?
 
-  wallets    Wallet[] @relation("SavingWallets")
+  wallets Wallet[] @relation("SavingWallets")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  userId    Int?
-  user      User?    @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  name      String
-  icon      String?
+  name String
+  icon String?
 
-  items     Item[]
+  type TransactionType
+
+  items Item[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,3 +1,4 @@
+import { TransactionType } from "../../generated/prisma";
 import { ResponseError } from "../error/response-error";
 import { CategoryResponse, CreateCategoryRequest, toCategoryResponse, UpdateCategoryRequest } from "../models/category-model";
 import { UserJWTPayload } from "../models/user-model";
@@ -35,10 +36,11 @@ export class CategoryService {
         return toCategoryResponse(category)
     }
 
-    static async list(user: UserJWTPayload): Promise<CategoryResponse[]> {
+    static async list(user: UserJWTPayload, type?: TransactionType): Promise<CategoryResponse[]> {
         const categories = await prismaClient.category.findMany({
             where: {
-                userId: user.id
+                userId: user.id,
+                type: type
             }
         })
 
