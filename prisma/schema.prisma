@@ -46,7 +46,7 @@ model Wallet {
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
-  defaultForUser User? @relation("DefaultWallet") // back-relation
+  defaultForUser User? @relation("DefaultWallet")
 
   name      String
   balance   Float   @default(0)

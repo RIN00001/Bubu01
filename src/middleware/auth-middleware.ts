@@ -13,13 +13,14 @@ export const authMiddleware = (req: UserRequest, res: Response, next: NextFuncti
         return next(new ResponseError(401, "Unauthorized: No token provided"));
     }
 
-    const payload = verifyToken(token!);
-    if (payload) {
-        req.user = payload;
-        next();
-    } else {
-        return next(new ResponseError(401, "Unauthorized: Invalid token"));
-    }
+        const payload = verifyToken(token!)
+        if (payload) {
+            req.user = payload
+            return next()
+        } else {
+            return next (new ResponseError(401, "Unauthorized: Invalid token"))
+        }
+
     } catch (error) {
     next(error);
 }
