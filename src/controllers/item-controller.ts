@@ -35,10 +35,21 @@ export class ItemController {
         }
     }
 
+
     static async update(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const request: UpdateItemRequest = req.body
-            request.id = Number(req.params.itemId)
+            const rawBody = req.body;
+
+            const request: UpdateItemRequest = {
+                ...rawBody,
+                id: Number(req.params.itemId),
+                amount: rawBody.amount !== undefined ? Number(rawBody.amount) : undefined,
+                bookId: rawBody.bookId ? Number(rawBody.bookId) : undefined,
+                walletId: rawBody.walletId ? Number(rawBody.walletId) : undefined,
+                categoryId: rawBody.categoryId ? Number(rawBody.categoryId) : undefined,
+                date: rawBody.date 
+            }
+
             const result = await ItemService.update(req.user!, request)
             res.status(200).json({data: result})
         } catch (error) {
