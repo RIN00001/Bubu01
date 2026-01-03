@@ -57,7 +57,7 @@ export class ItemService {
         }
 
         const item = await prismaClient.item.create({
-            data: createRequest
+            data: createRequest as any
         });
 
         return toItemResponse(item);

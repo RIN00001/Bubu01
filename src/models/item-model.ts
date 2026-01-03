@@ -9,7 +9,7 @@ export interface CreateItemRequest {
     type: TransactionType
     amount: number
     name: string
-    date: string | Date
+    date?: string | Date
 }
 
 export interface UpdateItemRequest {

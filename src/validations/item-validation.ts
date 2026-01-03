@@ -8,7 +8,7 @@ export class ItemValidation {
         type: z.enum(["INCOME", "EXPENSE"]),
         amount: z.number().positive(),
         name: z.string().min(1),
-        date: z.coerce.date(),
+        date: z.coerce.date().optional().default(() => new Date()), // Mengubah string ke Date & default ke waktu sekarang
     });
 
     static readonly GET: ZodType = z.object({
