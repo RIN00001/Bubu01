@@ -5,33 +5,92 @@ import { CreateBookRequest, UpdateBookRequest } from "../models/book-model";
 import { ResponseError } from "../error/response-error";
 
 export class BookService {
+  
+  // --- FITUR BARU: Auto-Connect Default Wallet ---
   static async create(userId: number, request: CreateBookRequest) {
     const data = validation.validate(BookValidation.CREATE, request);
 
+    // 1. Tentukan Wallet mana yang mau disambungkan
+    let walletConnectIds: { id: number }[] = [];
+
+    if (data.walletIds && data.walletIds.length > 0) {
+      // A. Jika User memilih wallet spesifik (misal lewat centang di UI)
+      walletConnectIds = data.walletIds.map((id) => ({ id }));
+    } else {
+      // B. Jika User TIDAK memilih wallet, cari Wallet Default milik user ini
+      const defaultWallet = await prismaClient.wallet.findFirst({
+        where: {
+          userId: userId,
+          isDefault: true // Pastikan field ini ada di schema.prisma
+        }
+      });
+
+      // Jika ada default wallet, kita masukkan ke list connect
+      if (defaultWallet) {
+        walletConnectIds = [{ id: defaultWallet.id }];
+      }
+    }
+
+    // 2. Buat Buku dengan relasi wallet yang sudah disiapkan
     const book = await prismaClient.book.create({
       data: {
         userId,
         name: data.name,
         program: data.program,
-        wallets: data.walletIds
-          ? { connect: data.walletIds.map((id) => ({ id })) }
-          : undefined,
+        wallets: {
+          connect: walletConnectIds // Sambungkan ke wallet (kosong atau default atau pilihan user)
+        },
       },
+      include: {
+        wallets: true // Return walletnya supaya Frontend langsung tau balancenya
+      }
     });
 
     return book;
   }
 
+  // --- GET ALL: Dengan Hitungan Income/Expense ---
   static async getAll(userId: number) {
-    return prismaClient.book.findMany({
+    // 1. Ambil semua buku & wallet (untuk Balance)
+    const books = await prismaClient.book.findMany({
       where: { userId },
       include: {
-        wallets: true,
+        wallets: true, 
       },
     });
+
+    // 2. Loop setiap buku untuk menghitung Income & Expense dari tabel Item
+    const booksWithStats = await Promise.all(books.map(async (book) => {
+      const aggregations = await prismaClient.item.groupBy({
+        by: ['type'],
+        where: {
+          bookId: book.id,
+        },
+        _sum: {
+          amount: true
+        }
+      });
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      aggregations.forEach(agg => {
+        if (agg.type === 'INCOME') totalIncome = agg._sum.amount || 0;
+        if (agg.type === 'EXPENSE') totalExpense = agg._sum.amount || 0;
+      });
+
+      return {
+        ...book,
+        totalIncome,
+        totalExpense
+      };
+    }));
+
+    return booksWithStats;
   }
 
-  static async getById(userId: number, bookId: number) {
+  // --- GET BY ID: Support Filter Tanggal ---
+  static async getById(userId: number, bookId: number, startDate?: Date, endDate?: Date) {
     const book = await prismaClient.book.findFirst({
       where: { id: bookId, userId },
       include: {
@@ -41,7 +100,41 @@ export class BookService {
     });
 
     if (!book) throw new ResponseError(404, "Book not found");
-    return book;
+
+    // Filter Tanggal
+    const dateFilter: any = {};
+    if (startDate && endDate) {
+      dateFilter.date = {
+        gte: startDate,
+        lte: endDate
+      };
+    }
+
+    // Hitung Aggregasi
+    const aggregations = await prismaClient.item.groupBy({
+      by: ['type'],
+      where: {
+        bookId: book.id,
+        ...dateFilter
+      },
+      _sum: {
+        amount: true
+      }
+    });
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    aggregations.forEach(agg => {
+      if (agg.type === 'INCOME') totalIncome = agg._sum.amount || 0;
+      if (agg.type === 'EXPENSE') totalExpense = agg._sum.amount || 0;
+    });
+
+    return {
+      ...book,
+      totalIncome,
+      totalExpense
+    };
   }
 
   static async update(userId: number, bookId: number, request: UpdateBookRequest) {
@@ -60,10 +153,13 @@ export class BookService {
         program: data.program,
         wallets: data.walletIds
           ? {
-              set: data.walletIds.map((id) => ({ id })), // replaces existing relations
+              set: data.walletIds.map((id) => ({ id })), 
             }
           : undefined,
       },
+      include: {
+        wallets: true // Return wallet terbaru
+      }
     });
 
     return updated;

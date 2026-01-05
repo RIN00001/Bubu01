@@ -3,9 +3,11 @@ import { BookService } from "../services/book-service";
 import { UserRequest } from "../models/user-request-model";
 
 export class BookController {
+  
   static async create(req: UserRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
+      // Service sekarang akan otomatis handle wallet default jika req.body.walletIds kosong
       const result = await BookService.create(userId, req.body);
       res.status(201).json({ data: result });
     } catch (err) {
@@ -27,7 +29,13 @@ export class BookController {
     try {
       const userId = req.user!.id;
       const bookId = Number(req.params.id);
-      const result = await BookService.getById(userId, bookId);
+
+      // Menangkap query params untuk filter tanggal (opsional)
+      // Contoh URL: /api/books/1?startDate=2024-01-01&endDate=2024-01-31
+      const startDate = req.query.startDate ? new Date(String(req.query.startDate)) : undefined;
+      const endDate = req.query.endDate ? new Date(String(req.query.endDate)) : undefined;
+
+      const result = await BookService.getById(userId, bookId, startDate, endDate);
       res.json({ data: result });
     } catch (err) {
       next(err);
