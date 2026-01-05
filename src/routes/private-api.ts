@@ -17,6 +17,11 @@ privateRouter.get("/books/:id", BookController.getById);
 privateRouter.put("/books/:id", BookController.update);
 privateRouter.delete("/books/:id", BookController.delete);
 
+// these routes are  for wallet-book relationship management
+privateRouter.post("/books/:id/wallets/:walletId", BookController.attachWallet);
+privateRouter.delete("/books/:id/wallets/:walletId", BookController.detachWallet);
+privateRouter.get("/books/:id/wallets", BookController.getBookWallets);
+
 // Wallet Routes
 privateRouter.post("/wallets", WalletController.create);
 privateRouter.get("/wallets", WalletController.getAll);
@@ -24,7 +29,7 @@ privateRouter.get("/wallets/:id", WalletController.getById);
 privateRouter.put("/wallets/:id", WalletController.update);
 privateRouter.delete("/wallets/:id", WalletController.delete);
 privateRouter.patch("/wallets/:id/default", WalletController.setDefault);
-
+privateRouter.get("/wallets/:id/summary", WalletController.getSummary);
 // Item routes
 privateRouter.post("/items", ItemController.create);
 privateRouter.get("/items", ItemController.list);

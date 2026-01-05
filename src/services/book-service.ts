@@ -177,4 +177,69 @@ export class BookService {
 
     return { message: "Book deleted" };
   }
+
+  static async attachWallet(userId: number, bookId: number, walletId: number) {
+    // Verify book ownership
+    const book = await prismaClient.book.findFirst({
+        where: { id: bookId, userId }
+    });
+    if (!book) throw new ResponseError(404, "Book not found");
+
+    // Verify wallet ownership  
+    const wallet = await prismaClient.wallet.findFirst({
+        where: { id: walletId, userId }
+    });
+    if (!wallet) throw new ResponseError(404, "Wallet not found");
+
+    // Attach wallet to book
+    return await prismaClient.book.update({
+        where: { id: bookId },
+        data: {
+            wallets: {
+                connect: { id: walletId }
+            }
+        },
+        include: { wallets: true }
+    });
+}
+
+static async detachWallet(userId: number, bookId: number, walletId: number) {
+    const book = await prismaClient.book.findFirst({
+        where: { id: bookId, userId }
+    });
+    if (!book) throw new ResponseError(404, "Book not found");
+
+    await prismaClient.book.update({
+        where: { id: bookId },
+        data: {
+            wallets: {
+                disconnect: { id: walletId }
+            }
+        }
+    });
+}
+
+static async getBookWallets(userId: number, bookId: number) {
+    const book = await prismaClient.book.findFirst({
+      where: { id: bookId, userId },
+      include: {
+        wallets: {
+          select: {
+            id: true,
+            name: true,
+            balance: true,
+            isDefault: true
+          }
+        }
+      }
+    });
+
+    if (!book) throw new ResponseError(404, "Book not found");
+
+    return {
+      bookId: book.id,
+      bookName: book.name,
+      wallets: book.wallets
+    };
+  }
 }

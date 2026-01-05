@@ -63,4 +63,40 @@ export class BookController {
       next(err);
     }
   }
+
+  static async attachWallet(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+        const bookId = Number(req.params.id);
+        const walletId = Number(req.params.walletId);
+        
+        const result = await BookService.attachWallet(req.user!.id, bookId, walletId);
+        res.json({ data: result });
+    } catch (err) {
+        next(err);
+    }
+}
+
+static async detachWallet(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+        const bookId = Number(req.params.id);
+        const walletId = Number(req.params.walletId);
+        
+        await BookService.detachWallet(req.user!.id, bookId, walletId);
+        res.json({ data: "Wallet detached successfully" });
+    } catch (err) {
+        next(err);
+    }
+}
+
+static async getBookWallets(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.id;
+      const bookId = Number(req.params.id);
+      
+      const result = await BookService.getBookWallets(userId, bookId);
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
 }

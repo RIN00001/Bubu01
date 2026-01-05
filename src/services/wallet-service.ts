@@ -99,4 +99,64 @@ export class WalletService {
 
     return { message: "Default wallet updated" };
   }
+
+
+static async getWalletSummary(userId: number, walletId: number, startDate?: Date, endDate?: Date) {
+  const wallet = await prismaClient.wallet.findFirst({
+    where: { id: walletId, userId },
+    include: {
+      books: {
+        select: {
+          id: true,
+          name: true,
+          program: true
+        }
+      }
+    }
+  });
+
+  if (!wallet) throw new ResponseError(404, "Wallet not found");
+
+  // Date filter for transactions
+  const dateFilter: any = {};
+  if (startDate && endDate) {
+    dateFilter.date = {
+      gte: startDate,
+      lte: endDate
+    };
+  }
+
+  // Calculate income/expense from items
+  const aggregations = await prismaClient.item.groupBy({
+    by: ['type'],
+    where: {
+      walletId: walletId,
+      ...dateFilter
+    },
+    _sum: {
+      amount: true
+    }
+  });
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+
+  aggregations.forEach(agg => {
+    if (agg.type === 'INCOME') totalIncome = agg._sum.amount || 0;
+    if (agg.type === 'EXPENSE') totalExpense = agg._sum.amount || 0;
+  });
+
+  return {
+    id: wallet.id,
+    name: wallet.name,
+    balance: wallet.balance,
+    isDefault: wallet.isDefault,
+    totalIncome,
+    totalExpense,
+    netFlow: totalIncome - totalExpense,
+    usedInBooks: wallet.books
+  };
+}
+
+
 }

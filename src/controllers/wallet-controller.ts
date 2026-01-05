@@ -69,4 +69,22 @@ export class WalletController {
       next(err);
     }
   }
+
+    static async getSummary(req: UserRequest, res: Response, next: NextFunction) {
+    try {
+      const walletId = Number(req.params.id);
+      const startDate = req.query.startDate ? new Date(String(req.query.startDate)) : undefined;
+      const endDate = req.query.endDate ? new Date(String(req.query.endDate)) : undefined;
+
+      const result = await WalletService.getWalletSummary(
+        req.user!.id,
+        walletId,
+        startDate,
+        endDate
+      );
+      res.json({ data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
